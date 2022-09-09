@@ -2,9 +2,6 @@ body {
     background-color: black;
     color: white;
 }
-.nav .nav-pills .nav-justified li a {
-    color: white;
-}
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
     color: #fff;
     background-color: #555555;
