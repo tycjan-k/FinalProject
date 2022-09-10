@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+
+{% block lognav %}
+    <ul class="nav nav-pills justify-content">
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
+        <li class="nav-item"><a class="nav-link white" href="#">Something</a></li>
+        <li class="nav-item"><a class="nav-link white" href="#">Another thing</a></li>
+    </ul>
+    <ul class="nav nav-pills ms-auto justify-content">
+        <li class="nav-item"><a class="nav-link white" href="/logout">Log Out</a></li>
+    </ul>
+{% endblock %}
+
+{% block main %}
+    <div class="container-fluid mt-3">
+        This is your personal homepage.
+    </div>
+{% endblock %}

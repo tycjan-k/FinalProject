@@ -5,13 +5,19 @@
 {% endblock %}
 
 {% block navbar %}
-    <ul class="nav nav-pills nav-justified">
-        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
-        <li class="nav-item"><a class="nav-link white" href="#">Log in</a></li>
-        <li class="nav-item"><a class="nav-link white" href="/register">Register</a></li>
-    </ul>
+    
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home">Home</a></li>
+        <li class="nav-item"><a class="nav-link " href="/login">Log in</a></li>
+        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+    
 {% endblock %}
 
 {% block main %}
-    To jest główny block main
+    <div class="justify-content-center align-items-center">
+    
+        <h3>To jest główny block main</h3>
+        <h5> To do something you need to <a class="link" href="/login">log in</a>. </h5>
+    
+    </div>
+
 {% endblock %}

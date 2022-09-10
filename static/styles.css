@@ -2,10 +2,24 @@ body {
     background-color: black;
     color: white;
 }
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+.nav-pills .nav-link.active {
     color: #fff;
     background-color: #555555;
 }
-.white {
+.nav-link.active:hover {
+    color: grey;
+}
+.nav-link {
     color:white;
+}
+.nav-link:hover {
+    color:grey;
+}
+a {
+    text-decoration: none;
+    color: white;
+}
+a:hover {
+    text-decoration: none;
+    color: grey;
 }
