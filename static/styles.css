@@ -26,3 +26,15 @@ a:hover {
 .table {
     color: white;
 }
+.btn-new {
+    background-color: #205090;
+    color: white;
+}
+.btn-new:hover {
+    background-color: #104080;
+    color: white;
+}
+.table {
+    border: 1px;
+    border-color: white;
+}

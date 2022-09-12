@@ -22,11 +22,54 @@
         </form>
     </div>
     <div class="container-fluid mt-3">
-        <form action="/train" method="post">
-            {% for training in user_table %}
-            <input type="hidden" name="id" value="{{ training['t_id'] }}">
-            <button class="btn btn-secondary" type="submit">{{ training["t_name"] }}</button>
-            {% endfor %}
-        </form>
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#trainings" aria-expanded="false" aria-controls="trainings">
+                Your exercises
+        </button>
+        <div class="collapse" id="trainings">
+            
+                <form action="/train" method="post"></form>
+                    {% for training in user_table %}
+                        <div class="container-fluid mt-3">
+                            <input type="hidden" name="id" value="{{ training['t_id'] }}">
+                            <button class="btn btn-new" type="submit">{{ training["t_name"] }}</button>
+                        </div>
+                    {% endfor %}
+                </form>
+        </div>
+    </div>
+    <div class="container-fluid mt-3">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#past" aria-expanded="false" aria-controls="past">
+            Your past trainings
+        </button>
+        <div class="collapse" id="past">
+            <div class="container-fluid mt-3 justify-content">
+                <table class="table table-bordered table-responsive table-striped table-dark">
+                    <thead>
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Day</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Training</th>
+                        <th scope="col">weight</th>
+                        <th scope="col">Reps in set</th>
+                        <th scope="col">Duration</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for training in user_table %}
+                    <tr>
+                        <td>{{ training["current_date"] }}</td>
+                        <td>{{ training["training_day"] }}</td>
+                        <td>{{ training["type"] }}</td>
+                        <td>{{ training["t_name"] }}</td>
+                        <td>{{ training["weight"] }}{{ training["w_unit"] }}</td>
+                        <td>{{ training["reps"] }} in {{ training["sets"] }}</td>
+                        <td>{{ training["duration"] }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}
