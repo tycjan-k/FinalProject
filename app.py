@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
 
 import time
+import datetime
 
 # Configure application
 app = Flask(__name__)
@@ -101,11 +102,6 @@ def login():
     else:
         return render_template("login.html")
 
-@app.route("/")
-@login_required
-def userhome():
-    """ user homepage """
-    return render_template("userhome.html")
 
 @app.route("/logout")
 def logout():
@@ -115,4 +111,37 @@ def logout():
     session.clear()
 
     # Redirect user to login form
-    return redirect("/")
+    return redirect("/home")
+
+@app.route("/")
+@login_required
+def userhome():
+    """ user homepage """
+    x = datetime.datetime.now()
+    day = x.strftime("%A")
+    date = datetime.date.today()
+    user_table = db.execute("SELECT * FROM ?", session["username"])
+    return render_template("userhome.html", date=date, day=day, user_table=user_table)
+
+@app.route("/add", methods=["GET", "POST"])
+@login_required
+def add():
+    """ adding new training """
+    if request.method == "POST":
+        user = session["user_id"]
+        username = db.execute("SELECT username FROM users WHERE id = ?", user)
+        session["username"] = username[0]["username"]
+        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT NOT NULL, t_name TEXT NOT NULL, weight NUMERIC, w_unit TEXT, reps NUMERIC, duration NUMERIC, sets NUMERIC NOT NULL, current_date TEXT, training_day TEXT)", session["username"])
+    return render_template("new.html", username=session["username"])
+
+@app.route("/new", methods=["GET", "POST"])
+@login_required
+def new():
+    if request.method == "POST":
+        typ = request.form.get("type")
+        name = request.form.get("name")
+        sets = request.form.get("sets")
+        training_day = request.form.get("training_day")
+        db.execute("INSERT INTO ? (type, t_name, sets, training_day) VALUES (?,?,?,?)", session["username"], typ, name, sets, training_day)
+        return redirect("/")
+    return render_template("new.html", username=session["username"])
