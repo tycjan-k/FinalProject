@@ -37,4 +37,5 @@ a:hover {
 .table {
     border: 1px;
     border-color: white;
+    width: auto;
 }

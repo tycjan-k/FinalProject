@@ -16,21 +16,21 @@
     </head>
     
     <body>
-        <div class="container-fluid">
-            <nav class="navbar navbar-dark bg-dark navbar navbar-expand-md">
+        <div>
+            <nav class="navbar navbar-dark bg-dark">
                     {% if session["user_id"] %}
-                        <ul class="nav nav-pills justify-content">
-                            {% block lognav %}{% endblock %}
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
                         </ul>
-                        <ul class="nav ms-auto">
+                        <ul class="nav mx-auto w-50">
                             {% block today %}{% endblock %}
                         </ul>
-                        <ul class="nav nav-pills ms-auto justify-content">
-                            <li class="nav-item"><a class="nav-link white" href="/logout">Log Out</a></li>
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link white" aria-current="page" href="/logout">Log Out</a></li>
                         </ul>
 
                     {% else %}
-                        <ul class="nav nav-pills justify-content mx-auto">
+                        <ul class="nav nav-pills mx-auto">
                         {% block navbar %}{% endblock %}
                         </ul>
                     {% endif %}
@@ -39,7 +39,7 @@
           
 
 
-        <main class="container-fluid text-center w-25">
+        <main class="container-fluid text-center w-75">
             {% block main %}{% endblock %}
         </main>
 

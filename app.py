@@ -121,7 +121,9 @@ def userhome():
     day = x.strftime("%A")
     date = datetime.date.today()
     user_table = db.execute("SELECT * FROM ?", session["username"])
-    return render_template("userhome.html", date=date, day=day, user_table=user_table)
+    tday = db.execute("SELECT type FROM ? WHERE training_day = ?", session["username"], day)
+    tday = tday[0]["type"]
+    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday)
 
 @app.route("/add", methods=["GET", "POST"])
 @login_required
