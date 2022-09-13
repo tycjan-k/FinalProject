@@ -5,10 +5,13 @@
 {% endblock %}
 
 {% block today %}
-        <li class="nav-item"> Today is <b>{{ day }}</b> which means it is <b>{{ tday }}</b> day! </li>
+        <li class="nav-item mx-auto"> Today is <b>{{ day }}</b> which means it is {% for t in tday %}<b>{{ t["type"] }} </b>{% endfor %} day! </li>
 {% endblock %}
 
 {% block main %}
+    <h2>
+        Hello {{ username }}! 
+    </h2>
     
         <form action="/add" method="post">
             <button class="btn btn-secondary mt-3" type="submit">Create new training</button>
@@ -20,7 +23,7 @@
         </button>
         <div class="collapse" id="trainings">
             
-                <form action="/train" method="post"></form>
+                <form action="/train" method="get"></form>
                     {% for training in user_table %}
                         <div class="container-fluid mt-3">
                             <input type="hidden" name="id" value="{{ training['t_id'] }}">
@@ -49,26 +52,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                        {% for training in user_table %}
-                    <tr>
-                        <td rowspan="{{ training['sets'] }}">{{ training["current_date"] }}</td>
-                        <td rowspan="{{ training['sets'] }}">{{ training["training_day"] }}</td>
-                        <td rowspan="{{ training['sets'] }}">{{ training["type"] }}</td>
-                        <td rowspan="{{ training['sets'] }}">{{ training["t_name"] }}</td>
-                        <td>{{ training["weight"] }} {{ training["w_unit"] }}</td>
-                        <td>{{ training["reps"] }} in {{ training["sets"] }}</td>
-                        <td>{{ training["duration"] }}</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>2</td>
-                        <td>2</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>2</td>
-                        <td>2</td>
-                    </tr>
+                    {% for training in user_table %}
+                    {% set r =  training['sets'] - 1 %}
+                        <tr>
+                            <td rowspan="{{ training['sets'] }}">{{ training["current_date"] }}</td>
+                            <td rowspan="{{ training['sets'] }}">{{ training["training_day"] }}</td>
+                            <td rowspan="{{ training['sets'] }}">{{ training["type"] }}</td>
+                            <td rowspan="{{ training['sets'] }}">{{ training["t_name"] }}</td>
+                            <td>{{ training["weight"] }} {{ training["w_unit"] }}</td>
+                            <td>{{ training["reps"] }} in {{ training["sets"] }}</td>
+                            <td>{{ training["duration"] }}</td>
+                        </tr>
+                        {% for i in range(r) %}
+                        <tr>
+                            <td>{{ training["weight"] }} {{ training["w_unit"] }}</td>
+                            <td>{{ training["reps"] }} in {{ training["sets"] }}</td>
+                            <td>{{ training["duration"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    
                     {% endfor %}
                     </tbody>
                 </table>

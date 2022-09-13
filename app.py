@@ -117,24 +117,27 @@ def logout():
 @login_required
 def userhome():
     """ user homepage """
+    
+    """ Get the current day and date """
     x = datetime.datetime.now()
     day = x.strftime("%A")
     date = datetime.date.today()
     user_table = db.execute("SELECT * FROM ?", session["username"])
     tday = db.execute("SELECT type FROM ? WHERE training_day = ?", session["username"], day)
-    tday = tday[0]["type"]
-    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday)
+
+    """ Greet the user """
+    user = session["user_id"]
+    username = db.execute("SELECT username FROM users WHERE id = ?", user)
+    session["username"] = username[0]["username"]
+    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"])
 
 @app.route("/add", methods=["GET", "POST"])
 @login_required
 def add():
     """ adding new training """
     if request.method == "POST":
-        user = session["user_id"]
-        username = db.execute("SELECT username FROM users WHERE id = ?", user)
-        session["username"] = username[0]["username"]
         db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT NOT NULL, t_name TEXT NOT NULL, weight NUMERIC, w_unit TEXT, reps NUMERIC, duration NUMERIC, sets NUMERIC NOT NULL, current_date TEXT, training_day TEXT)", session["username"])
-    return render_template("new.html", username=session["username"])
+    return render_template("new.html")
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
@@ -146,4 +149,11 @@ def new():
         training_day = request.form.get("training_day")
         db.execute("INSERT INTO ? (type, t_name, sets, training_day) VALUES (?,?,?,?)", session["username"], typ, name, sets, training_day)
         return redirect("/")
-    return render_template("new.html", username=session["username"])
+    return render_template("new.html")
+
+@app.route("/train", methods=["GET", "POST"])
+@login_required
+def train():
+    if request.method == "POST":
+        return
+    return render_template("train.html")
