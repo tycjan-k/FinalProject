@@ -118,26 +118,26 @@ def logout():
 def userhome():
     """ user homepage """
     
-    """ Get the current day and date """
-    x = datetime.datetime.now()
-    day = x.strftime("%A")
-    date = datetime.date.today()
-    user_table = db.execute("SELECT * FROM ?", session["username"])
-    tday = db.execute("SELECT type FROM ? WHERE training_day = ?", session["username"], day)
-
     """ Greet the user """
     user = session["user_id"]
     username = db.execute("SELECT username FROM users WHERE id = ?", user)
     session["username"] = username[0]["username"]
-    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"])
 
-@app.route("/add", methods=["GET", "POST"])
-@login_required
-def add():
-    """ adding new training """
-    if request.method == "POST":
-        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT NOT NULL, t_name TEXT NOT NULL, weight NUMERIC, w_unit TEXT, reps NUMERIC, duration NUMERIC, sets NUMERIC NOT NULL, current_date TEXT, training_day TEXT)", session["username"])
-    return render_template("new.html")
+    """ Get the current day and date """
+    x = datetime.datetime.now()
+    day = x.strftime("%A")
+    date = datetime.date.today()
+    exists = db.execute("SELECT EXISTS ( SELECT name FROM sqlite_master WHERE type='table' AND name=?)", session["username"])
+    for i in exists[0]:
+        x = exists[0][i]
+    if ( x == 1):
+        user_table = db.execute("SELECT * FROM ? ORDER BY t_id DESC", session["username"])
+        tday = db.execute("SELECT type FROM ? WHERE training_day = ?", session["username"], day)
+    else:
+        user_table = False
+        tday = False
+    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"], exists=x)
+
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
@@ -147,6 +147,7 @@ def new():
         name = request.form.get("name")
         sets = request.form.get("sets")
         training_day = request.form.get("training_day")
+        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT NOT NULL, t_name TEXT NOT NULL, weight NUMERIC, w_unit TEXT, reps NUMERIC, duration NUMERIC, sets NUMERIC NOT NULL, current_date TEXT, training_day TEXT)", session["username"])
         db.execute("INSERT INTO ? (type, t_name, sets, training_day) VALUES (?,?,?,?)", session["username"], typ, name, sets, training_day)
         return redirect("/")
     return render_template("new.html")
