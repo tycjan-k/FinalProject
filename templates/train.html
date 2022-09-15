@@ -6,5 +6,66 @@
 
 
 {% block main %}
+<div class="container-fluid mt-3 mx-auto" style="width: 450px;">
+    <form action="/train" method="post">
 
+        <div class="mt-3 mb-3 form-group row">
+            <label class="col-sm-2 col-form-label">Type</label>
+            <div class="col-sm-10">
+                <input type="checkbox" class="btn-check" id="type" name="type" autocomplete="off" disabled value="{{ typ }}">
+                <label class="btn btn-new" for="type">{{ typ }}</label>
+            </div>
+        </div>
+
+        <div class="mt-3 mb-3 form-group row">
+            <label class="col-sm-2 col-form-label">Name</label>
+            <div class="col-sm-10">
+                <select class="form-select" id="name" name="name">
+                    <option selected disabled>Choose exercise</option>
+                    {% for training in trainings %}
+                    <option>{{ training["name"] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-3 form-group row">
+            <label class="col-sm-4 col-form-label">Weight</label>
+            <div class="col-sm-8">
+                <input autocomplete="off" class="form-control" id="weight" name="weight" placeholder="Weight" type="number" min="1">
+            </div>
+        </div>
+
+        <div class="mt-3">
+                
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="inlineCheckbox1" name="unit" value="kg">
+                    <label class="form-check-label" for="inlineCheckbox1">kg</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="inlineCheckbox2" name="unit" value="lb">
+                    <label class="form-check-label" for="inlineCheckbox2">lb</label>
+                </div>
+                  
+        </div>
+
+        <div class="mt-3 form-group row">
+            <label class="col-sm-4 col-form-label">Repetitions</label>
+            <div class="col-sm-8">
+                <input autocomplete="off" class="form-control" id="reps" name="reps" placeholder="Reps" type="number" min="1">
+            </div>
+        </div>
+
+        <div class="mt-3 mb-3 form-group row">
+            <label class="col-sm-4 col-form-label">Duration</label>
+            <div class="col-sm-8">
+                <input autocomplete="off" class="form-control" id="duration" name="duration" placeholder="Duration in seconds" type="number" min="1">
+            </div>
+        </div>
+            
+
+
+        <button class="btn btn-secondary" type="submit">Add training</button>
+    </form>
+</div>
 {% endblock %}

@@ -127,17 +127,46 @@ def userhome():
     x = datetime.datetime.now()
     day = x.strftime("%A")
     date = datetime.date.today()
+    
     exists = db.execute("SELECT EXISTS ( SELECT name FROM sqlite_master WHERE type='table' AND name=?)", session["username"])
     for i in exists[0]:
         x = exists[0][i]
     if ( x == 1):
-        user_table = db.execute("SELECT * FROM ? ORDER BY t_id DESC", session["username"])
-        tday = db.execute("SELECT type FROM ? WHERE training_day = ?", session["username"], day)
+        user_table = db.execute("SELECT * FROM  ? ORDER BY t_id DESC", session["username"])
+        tday = db.execute("SELECT DISTINCT type FROM ? WHERE day = ?", session["username"], day)
     else:
         user_table = False
         tday = False
-    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"], exists=x)
+    
 
+    """ Your trainings tab"""
+    trainings = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ?", session["user_id"])
+    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"], exists=x, trainings=trainings)
+
+
+@app.route("/train", methods=["GET", "POST"])
+@login_required
+def train():
+    """ id comes from userhome via Your Trainings"""
+    typ = request.args.get("type")
+    trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
+    """ POST route from train.html form"""
+    if request.method == "POST":
+        typ = request.form.get("type")
+        name = request.form.get("name")
+        weight = request.form.get("weight")
+        unit = request.form.get("unit")
+        reps = request.form.get("reps")
+        duration = request.form.get("duration")
+        x = datetime.datetime.now()
+        day = x.strftime("%A")
+        current_date = datetime.date.today()
+        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT, name TEXT NOT NULL, weight NUMERIC, unit TEXT, reps NUMERIC, duration NUMERIC, current_date TEXT, day TEXT)", session["username"])
+        db.execute("INSERT INTO ? (type, name, weight, unit, reps, duration, day, current_date) VALUES (?,?,?,?,?,?,?,?)", session["username"], typ, name, weight, unit, 
+        reps, duration, day, current_date)
+        return render_template("userhome.html", typ=typ)
+    """GET route from userhome or any other"""
+    return render_template("train.html", typ=typ, trainings=trainings)
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
@@ -145,16 +174,7 @@ def new():
     if request.method == "POST":
         typ = request.form.get("type")
         name = request.form.get("name")
-        sets = request.form.get("sets")
         training_day = request.form.get("training_day")
-        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT NOT NULL, t_name TEXT NOT NULL, weight NUMERIC, w_unit TEXT, reps NUMERIC, duration NUMERIC, sets NUMERIC NOT NULL, current_date TEXT, training_day TEXT)", session["username"])
-        db.execute("INSERT INTO ? (type, t_name, sets, training_day) VALUES (?,?,?,?)", session["username"], typ, name, sets, training_day)
+        db.execute("INSERT INTO trainings (user_id, type, name, training_day) VALUES (?,?,?,?)", session["user_id"], typ, name, training_day)
         return redirect("/")
     return render_template("new.html")
-
-@app.route("/train", methods=["GET", "POST"])
-@login_required
-def train():
-    if request.method == "POST":
-        return
-    return render_template("train.html")
