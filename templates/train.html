@@ -8,13 +8,10 @@
 {% block main %}
 <div class="container-fluid mt-3 mx-auto" style="width: 450px;">
     <form action="/train" method="post">
+        <input type="hidden" name="type" value="{{ typ }}">
 
         <div class="mt-3 mb-3 form-group row">
-            <label class="col-sm-2 col-form-label">Type</label>
-            <div class="col-sm-10">
-                <input type="checkbox" class="btn-check" id="type" name="type" autocomplete="off" disabled value="{{ typ }}">
-                <label class="btn btn-new" for="type">{{ typ }}</label>
-            </div>
+            <button class="btn btn-new" disabled>{{ typ }}</button>
         </div>
 
         <div class="mt-3 mb-3 form-group row">
