@@ -39,4 +39,7 @@ a:hover {
     border-color: white;
     width: auto;
 }
+.no-bullets {
+    list-style-type: none;
+}
 

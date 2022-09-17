@@ -39,73 +39,88 @@ def home():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
+
+    #Empty error message
+    error = None
 
     #User reached route via POST (clicking on a button with a post method)
     if request.method == "POST":
 
         #Require username
         if not request.form.get("username"):
-            return false
+            error = 'You did not provide an username'
+            return render_template("register.html", error=error)
         #Look if username is taken and apologize if it is
         lookusname = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
         if len(lookusname) != 0:
-            return false
+            error = 'Username is already taken'
+            return render_template("register.html", error=error)
         else:
             username = request.form.get("username")
 
         #Require password
         if not request.form.get("password"):
-            return false
+            error = 'You did not provide a password'
+            return render_template("register.html", error=error)
         password = request.form.get("password")
+
+        #Confirm password and add it to the users table
         confirmation = request.form.get("confirmation")
         if password != confirmation:
-            return false
+            error = 'Passwords do not match'
+            return render_template("register.html", error=error)
         else:
             db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, generate_password_hash(password))
+        # Redirect user to home page
+        flash('You successfully registered')
+        return redirect("/home")
 
-        return redirect("/")
+    #User got here via GET request
     return render_template("register.html")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Log user in"""
 
     # Forget any user_id
     session.clear()
+
+    #create empty error message 
+    error = None
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return false
+            error = 'Empty username field'
+            return render_template("login.html", error=error)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return false
+            error = 'Empty password field'
+            return render_template("login.html", error=error)
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return false
+            error = 'Wrong username or password'
+            return render_template("login.html", error=error)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
+        flash('you logged in')
         return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("login.html")
+    return render_template("login.html")
 
 
 @app.route("/logout")
 def logout():
-    """Log user out"""
 
     # Forget any user_id
     session.clear()
@@ -118,12 +133,12 @@ def logout():
 def userhome():
     """ user homepage """
     
-    """ Greet the user """
+    # Greet the user
     user = session["user_id"]
     username = db.execute("SELECT username FROM users WHERE id = ?", user)
     session["username"] = username[0]["username"]
 
-    """ Get the current day and date """
+    #Get the current day and date
     x = datetime.datetime.now()
     day = x.strftime("%A")
     date = datetime.date.today()
@@ -133,24 +148,26 @@ def userhome():
         x = exists[0][i]
     if ( x == 1):
         user_table = db.execute("SELECT * FROM  ? ORDER BY t_id DESC", session["username"])
-        tday = db.execute("SELECT DISTINCT type FROM ? WHERE day = ?", session["username"], day)
+        tday = db.execute("SELECT DISTINCT type FROM trainings WHERE training_day = ?", day)
     else:
         user_table = False
         tday = False
     
 
-    """ Your trainings tab"""
+    #Your trainings tab
     trainings = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ?", session["user_id"])
+        
     return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"], exists=x, trainings=trainings)
 
 
 @app.route("/train", methods=["GET", "POST"])
 @login_required
 def train():
-    """ id comes from userhome via Your Trainings"""
+    # id comes from userhome via Your Trainings
     typ = request.args.get("type")
     trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
-    """ POST route from train.html form"""
+
+    #POST route from train.html form
     if request.method == "POST":
         typ = request.form.get("type")
         name = request.form.get("name")
@@ -160,12 +177,13 @@ def train():
         duration = request.form.get("duration")
         x = datetime.datetime.now()
         day = x.strftime("%A")
-        current_date = datetime.date.today()
-        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT, name TEXT NOT NULL, weight NUMERIC, unit TEXT, reps NUMERIC, duration NUMERIC, current_date TEXT, day TEXT)", session["username"])
-        db.execute("INSERT INTO ? (type, name, weight, unit, reps, duration, day, current_date) VALUES (?,?,?,?,?,?,?,?)", session["username"], typ, name, weight, unit, 
-        reps, duration, day, current_date)
-        return render_template("userhome.html", typ=typ)
-    """GET route from userhome or any other"""
+        tdate = datetime.date.today()
+        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT, name TEXT NOT NULL, weight NUMERIC, unit TEXT, reps NUMERIC, duration NUMERIC, tdate TEXT, day TEXT)", session["username"])
+        db.execute("INSERT INTO ? (type, name, weight, unit, reps, duration, day, tdate) VALUES (?,?,?,?,?,?,?,?)", session["username"], typ, name, weight, unit, 
+        reps, duration, day, tdate)
+        return redirect("/")
+
+    #GET route from userhome or any other
     return render_template("train.html", typ=typ, trainings=trainings)
 
 @app.route("/new", methods=["GET", "POST"])

@@ -6,6 +6,23 @@
 
 
 {% block main %}
+<div class="container-fluid text-center w-50">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes no-bullets">
+            {% for message in messages %}
+                <li>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+
 <div class="container-fluid mt-3 mx-auto" style="width: 450px;">
     <form action="/train" method="post">
         <input type="hidden" name="type" value="{{ typ }}">
@@ -62,7 +79,8 @@
             
 
 
-        <button class="btn btn-secondary" type="submit">Add training</button>
+        <button class="btn btn-secondary" type="submit">Exercise completed</button>
+        <button class="btn btn-secondary" type="submit" href="/train">Add another set</button>
     </form>
 </div>
 {% endblock %}
