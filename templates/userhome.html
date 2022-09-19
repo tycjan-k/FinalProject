@@ -14,7 +14,7 @@
 
 {% block main %}
     <h2>
-        Hello {{ username }}! Exists: {{ exists }} Typ: {{ typ }}
+        Hello {{ username }}!
     </h2>
     
         <form action="/new" method="get">
@@ -37,7 +37,6 @@
                     
         </div>
     </div>
-    {% if user_table != False %}
         <div class="container-fluid mt-3">
             <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#past" aria-expanded="false" aria-controls="past">
                 Your past trainings
@@ -47,40 +46,47 @@
                     <table class="mx-auto table table-bordered table-striped table-dark">
                         <thead>
                         <tr>
-                            <th>Date</th>
-                            <th>Day</th>
                             <th>Type</th>
-                            <th>Training</th>
-                            <th>weight</th>
-                            <th>Reps in set</th>
+                            <th>Date</th>
+                            <th>Exercise</th>
+                            <th>Weight</th>
+                            <th>Repetitions</th>
                             <th>Duration</th>
                         </tr>
                         </thead>
                         <tbody>
-                        {% for training in user_table %}
-                        {% set r =  3 - 1 %}
-                            <tr>
-                                <td rowspan="3">{{ training["tdate"] }}</td>
-                                <td rowspan="3">{{ training["day"] }}</td>
-                                <td rowspan="3">{{ training["type"] }}</td>
-                                <td rowspan="3">{{ training["name"] }}</td>
-                                <td>{{ training["weight"] }} {{ training["unit"] }}</td>
-                                <td>{{ training["reps"] }} in 3</td>
-                                <td>{{ training["duration"] }}</td>
-                            </tr>
-                            {% for i in range(r) %}
-                            <tr>
-                                <td>{{ training["weight"] }} {{ training["unit"] }}</td>
-                                <td>{{ training["reps"] }} in 3</td>
-                                <td>{{ training["duration"] }}</td>
-                            </tr>
+                            {% for daytren in user_trens %}
+                                {% set var = {'first': true} %}
+                                <tr>
+                                    <td rowspan="{{ daytren['sets'] }}">{{ daytren["type"] }}</td>
+                                    <td rowspan="{{ daytren['sets'] }}">{{ daytren["tdate"] }}</td>
+                                    <td rowspan="{{ daytren['sets'] }}">{{ daytren["name"] }}</td>
+                                    
+                                    {% for training in user_table %}
+                                    
+                                        {% if training["tdate"] == daytren["tdate"] and training["name"] == daytren["name"] %}
+                                            {% if var['first'] %}
+                                                
+                                                    <td>{{ training["weight"] }} {{ training["unit"] }}</td>
+                                                    <td>&times;{{ training["reps"] }}</td>
+                                                    <td>{{ training["duration"] }} sec.</td>
+                                                </tr>
+                                                {% if var.update({'first': false}) %}{% endif %}
+                                            {% else %}
+                                                <tr>
+                                                    <td>{{ training["weight"] }} {{ training["unit"] }}</td>
+                                                    <td>&times;{{ training["reps"] }}</td>
+                                                    <td>{{ training["duration"] }} sec.</td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endif %}
+                                    
+                                    {% endfor %}
                             {% endfor %}
-                        
-                        {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    {% endif %}
+
 {% endblock %}

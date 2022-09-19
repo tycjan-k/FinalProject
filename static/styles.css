@@ -42,4 +42,6 @@ a:hover {
 .no-bullets {
     list-style-type: none;
 }
-
+td {
+    vertical-align: middle;
+}

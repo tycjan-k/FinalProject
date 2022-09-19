@@ -132,7 +132,6 @@ def logout():
 @login_required
 def userhome():
     """ user homepage """
-    
     # Greet the user
     user = session["user_id"]
     username = db.execute("SELECT username FROM users WHERE id = ?", user)
@@ -142,22 +141,16 @@ def userhome():
     x = datetime.datetime.now()
     day = x.strftime("%A")
     date = datetime.date.today()
-    
-    exists = db.execute("SELECT EXISTS ( SELECT name FROM sqlite_master WHERE type='table' AND name=?)", session["username"])
-    for i in exists[0]:
-        x = exists[0][i]
-    if ( x == 1):
-        user_table = db.execute("SELECT * FROM  ? ORDER BY t_id DESC", session["username"])
-        tday = db.execute("SELECT DISTINCT type FROM trainings WHERE training_day = ?", day)
-    else:
-        user_table = False
-        tday = False
-    
+
+    user_table = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY t_id DESC", user)
+    tday = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ? AND training_day = ?", user, day)
+    user_trens = db.execute("SELECT DISTINCT type, name, tdate, sets FROM exercises WHERE user_id = ?", user)
 
     #Your trainings tab
     trainings = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ?", session["user_id"])
+
         
-    return render_template("userhome.html", date=date, day=day, user_table=user_table, tday=tday, username=session["username"], exists=x, trainings=trainings)
+    return render_template("userhome.html", date=date, day=day, user_table=user_table, user_trens=user_trens, tday=tday, username=session["username"], trainings=trainings)
 
 
 @app.route("/train", methods=["GET", "POST"])
@@ -165,7 +158,6 @@ def userhome():
 def train():
     # id comes from userhome via Your Trainings
     typ = request.args.get("type")
-    trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
 
     #POST route from train.html form
     if request.method == "POST":
@@ -178,12 +170,21 @@ def train():
         x = datetime.datetime.now()
         day = x.strftime("%A")
         tdate = datetime.date.today()
-        db.execute("CREATE TABLE IF NOT EXISTS ? (t_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, type TEXT, name TEXT NOT NULL, weight NUMERIC, unit TEXT, reps NUMERIC, duration NUMERIC, tdate TEXT, day TEXT)", session["username"])
-        db.execute("INSERT INTO ? (type, name, weight, unit, reps, duration, day, tdate) VALUES (?,?,?,?,?,?,?,?)", session["username"], typ, name, weight, unit, 
-        reps, duration, day, tdate)
-        return redirect("/")
+        #sets
+        sets = db.execute("SELECT COUNT(*) FROM exercises WHERE user_id = ? AND name = ? AND tdate = ?", session["user_id"], name, tdate)
+        sets = sets[0]
+        for i in sets:
+            s = sets[i] + 1
+            db.execute("UPDATE exercises SET sets = ? WHERE user_id = ? AND name = ? AND tdate = ?", s, session["user_id"], name, tdate)
+        #Insert data into table
+        db.execute("INSERT INTO exercises (user_id, type, name, weight, unit, reps, duration, day, tdate, sets) VALUES (?,?,?,?,?,?,?,?,?,?)", session["user_id"], typ, name, weight, unit, 
+        reps, duration, day, tdate, s)
+        #give feedback to the user
+        flash('Set added')
 
     #GET route from userhome or any other
+
+    trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
     return render_template("train.html", typ=typ, trainings=trainings)
 
 @app.route("/new", methods=["GET", "POST"])
