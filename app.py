@@ -142,15 +142,18 @@ def userhome():
     day = x.strftime("%A")
     date = datetime.date.today()
 
-    user_table = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY t_id DESC", user)
+    
     tday = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ? AND training_day = ?", user, day)
-    user_trens = db.execute("SELECT DISTINCT type, name, tdate, sets FROM exercises WHERE user_id = ?", user)
+    
 
     #Your trainings tab
     trainings = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ?", session["user_id"])
-
+    
+    #Your past trainings tab
+    all_trainings = db.execute("SELECT * FROM trainings WHERE user_id = ?", session["user_id"])
         
-    return render_template("userhome.html", date=date, day=day, user_table=user_table, user_trens=user_trens, tday=tday, username=session["username"], trainings=trainings)
+    return render_template("userhome.html", date=date, day=day, tday=tday, 
+    username=session["username"], trainings=trainings, all_trainings=all_trainings)
 
 
 @app.route("/train", methods=["GET", "POST"])
@@ -197,3 +200,13 @@ def new():
         db.execute("INSERT INTO trainings (user_id, type, name, training_day) VALUES (?,?,?,?)", session["user_id"], typ, name, training_day)
         return redirect("/")
     return render_template("new.html")
+
+@app.route("/filtr")
+def filtr():
+    user = session["user_id"]
+    user_table = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY t_id DESC", user)
+    user_trens = db.execute("SELECT DISTINCT type, name, tdate, sets FROM exercises WHERE user_id = ?", user)
+    cryteria = request.args.get("cryteria")
+    if cryteria == 'all':
+        return render_template("all.html", user_table=user_table, user_trens=user_trens, cryteria=cryteria)
+    return render_template("filtr.html", user_table=user_table, user_trens=user_trens, cryteria=cryteria)

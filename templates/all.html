@@ -1,0 +1,29 @@
+Kryterium to {{ cryteria }}
+{% for daytren in user_trens %}
+    {% set var = {'first': true} %}
+    <tr>
+        <td rowspan="{{ daytren['sets'] }}">{{ daytren["type"] }}</td>
+        <td rowspan="{{ daytren['sets'] }}">{{ daytren["tdate"] }}</td>
+        <td rowspan="{{ daytren['sets'] }}">{{ daytren["name"] }}</td>
+        
+        {% for training in user_table %}
+                                    
+            {% if training["tdate"] == daytren["tdate"] and training["name"] == daytren["name"] %}
+                {% if var['first'] %}
+                    
+                        <td>{{ training["weight"] }} {{ training["unit"] }}</td>
+                        <td>&times;{{ training["reps"] }}</td>
+                        <td>{{ training["duration"] }} sec.</td>
+                    </tr>
+                    {% if var.update({'first': false}) %}{% endif %}
+                {% else %}
+                    <tr>
+                        <td>{{ training["weight"] }} {{ training["unit"] }}</td>
+                        <td>&times;{{ training["reps"] }}</td>
+                        <td>{{ training["duration"] }} sec.</td>
+                    </tr>
+                {% endif %}
+            {% endif %}
+    
+        {% endfor %}
+{% endfor %}
