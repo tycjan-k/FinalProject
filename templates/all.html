@@ -1,11 +1,10 @@
-Kryterium to {{ cryteria }}
 {% for daytren in user_trens %}
-    {% set var = {'first': true} %}
-    <tr>
-        <td rowspan="{{ daytren['sets'] }}">{{ daytren["type"] }}</td>
-        <td rowspan="{{ daytren['sets'] }}">{{ daytren["tdate"] }}</td>
-        <td rowspan="{{ daytren['sets'] }}">{{ daytren["name"] }}</td>
-        
+    {% if daytren['type'] == crytid or crytid == 'all' %}
+        {% set var = {'first': true} %}
+        <tr>
+            <td rowspan="{{ daytren['sets'] }}">{{ daytren["type"] }}</td>
+            <td rowspan="{{ daytren['sets'] }}">{{ daytren["tdate"] }}</td>
+            <td rowspan="{{ daytren['sets'] }}">{{ daytren["name"] }}</td>
         {% for training in user_table %}
                                     
             {% if training["tdate"] == daytren["tdate"] and training["name"] == daytren["name"] %}
@@ -26,4 +25,5 @@ Kryterium to {{ cryteria }}
             {% endif %}
     
         {% endfor %}
+    {% endif %}
 {% endfor %}

@@ -1,6 +1,5 @@
-Kryterium to {{ cryteria }}
 {% for daytren in user_trens %}
-    {% if daytren["type"] == cryteria %}
+    {% if daytren['idt'] == crytid %}
         {% set var = {'first': true} %}
         <tr>
             <td rowspan="{{ daytren['sets'] }}">{{ daytren["type"] }}</td>
@@ -22,7 +21,6 @@ Kryterium to {{ cryteria }}
                     </tr>
                 {% endif %}
             {% endif %}
-                                        
         {% endfor %}
     {% endif %}
 {% endfor %}

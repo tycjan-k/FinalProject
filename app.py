@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -147,13 +147,10 @@ def userhome():
     
 
     #Your trainings tab
-    trainings = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ?", session["user_id"])
+    user_types = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ?", user)
     
-    #Your past trainings tab
-    all_trainings = db.execute("SELECT * FROM trainings WHERE user_id = ?", session["user_id"])
-        
     return render_template("userhome.html", date=date, day=day, tday=tday, 
-    username=session["username"], trainings=trainings, all_trainings=all_trainings)
+    username=session["username"], user_types=user_types)
 
 
 @app.route("/train", methods=["GET", "POST"])
@@ -173,14 +170,19 @@ def train():
         x = datetime.datetime.now()
         day = x.strftime("%A")
         tdate = datetime.date.today()
+        idt = db.execute("SELECT id FROM trainings WHERE type = ? AND name = ?", typ, name)
+        idt = idt[0]['id']
+
         #sets
         sets = db.execute("SELECT COUNT(*) FROM exercises WHERE user_id = ? AND name = ? AND tdate = ?", session["user_id"], name, tdate)
         sets = sets[0]
         for i in sets:
             s = sets[i] + 1
             db.execute("UPDATE exercises SET sets = ? WHERE user_id = ? AND name = ? AND tdate = ?", s, session["user_id"], name, tdate)
+
+        
         #Insert data into table
-        db.execute("INSERT INTO exercises (user_id, type, name, weight, unit, reps, duration, day, tdate, sets) VALUES (?,?,?,?,?,?,?,?,?,?)", session["user_id"], typ, name, weight, unit, 
+        db.execute("INSERT INTO exercises (idt, user_id, type, name, weight, unit, reps, duration, day, tdate, sets) VALUES (?,?,?,?,?,?,?,?,?,?,?)", idt, session["user_id"], typ, name, weight, unit, 
         reps, duration, day, tdate, s)
         #give feedback to the user
         flash('Set added')
@@ -204,9 +206,24 @@ def new():
 @app.route("/filtr")
 def filtr():
     user = session["user_id"]
-    user_table = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY t_id DESC", user)
-    user_trens = db.execute("SELECT DISTINCT type, name, tdate, sets FROM exercises WHERE user_id = ?", user)
-    cryteria = request.args.get("cryteria")
-    if cryteria == 'all':
-        return render_template("all.html", user_table=user_table, user_trens=user_trens, cryteria=cryteria)
-    return render_template("filtr.html", user_table=user_table, user_trens=user_trens, cryteria=cryteria)
+    user_table = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY id DESC", user)
+    user_trens = db.execute("SELECT DISTINCT idt, type, name, tdate, sets FROM exercises WHERE user_id = ?", user)
+    crytid = request.args.get("crytid")
+    if crytid == 'all':
+        return render_template("all.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
+    for training in user_trens:
+        if crytid == training["type"]:
+            return render_template("all.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
+    crytid = int(crytid)
+    return render_template("filtr.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
+
+@app.route("/filtype")
+def filtype():
+    user = session["user_id"]
+    typ = request.args.get("type")
+    if typ == 'all':
+        trainings = db.execute("SELECT * FROM trainings WHERE user_id = ?", user)
+        trainings[0]["type"] = 'all'
+    else:
+        trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", user, typ)
+    return jsonify(trainings)

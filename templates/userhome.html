@@ -26,11 +26,11 @@
         </button>
         <div class="collapse" id="trainings">
               
-            {% for training in trainings %}
+            {% for Typ in user_types %}
                 <form action="/train" method="get">
                     <div class="container-fluid mt-3">
-                        <input type="hidden" name="type" value="{{ training['type'] }}">
-                        <button class="btn btn-new" type="submit">{{ training["type"] }}</button>
+                        <input type="hidden" name="type" value="{{ Typ['type'] }}">
+                        <button class="btn btn-new" type="submit">{{ Typ["type"] }}</button>
                     </div>
                 </form>
             {% endfor %}
@@ -42,43 +42,74 @@
                 Your past trainings
             </button>
             <div class="collapse" id="past">
-                
-                <select class="form-select mt-3 mx-auto" style="width: 250px;" id="filtr">
-                    <option selected disabled>Choose exercise group</option>
-                    <option value="all" >All groups</option>
-                    {% for training in trainings %}
-                    <option value="{{ training['type'] }}">{{ training["type"] }}</option>
+
+                <select class="form-select mt-3 w-25 mx-auto" id="filtype">
+                    <option selected disabled>Choose exercise type</option>
+                    <option value="all">All types</option>
+                    {% for typ in user_types %}
+                    <option value="{{ typ['type'] }}">{{ typ['type'] }}</option>
                     {% endfor %}
                 </select>
+                
+                <div class="container mt-3">
+                    <select class="form-select mt-3 w-25 mx-auto" id="filtr">
+                        <option selected disabled>Choose exercise</option>
+                    </select>
+                    
+                    
 
-                <div class="mt-3 table-responsive">
-                    <table class="mx-auto table table-bordered table-striped table-dark">
-                        <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Date</th>
-                            <th>Exercise</th>
-                            <th>Weight</th>
-                            <th>Repetitions</th>
-                            <th>Duration</th>
-                        </tr>
-                        </thead>
-                        <tbody id="filtr_table">
-                            
-                        </tbody>
-                    </table>
-                    <script>
-    
-                        let input = document.querySelector('#filtr');
-                        input.addEventListener('input', async function() {
-                            let response = await fetch('/filtr?cryteria=' + input.value);
-                            let value = await response.text();
-                            document.querySelector('#filtr_table').innerHTML = value;
-                        });
-            
-                    </script>
+                    <div class="mt-3 table-responsive">
+                        <table class="mx-auto table table-bordered table-striped table-dark">
+                            <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Exercise</th>
+                                <th>Weight</th>
+                                <th>Repetitions</th>
+                                <th>Duration</th>
+                            </tr>
+                            </thead>
+                            <tbody id="filtr_table">
+                                
+                            </tbody>
+                        </table>
+                    
+                    </div>
+                    
+                        
                 </div>
+                
+                    
+                    <script>
+                        let input = document.querySelector('#filtr');
+                            input.addEventListener('input', async function() {
+                                let response1 = await fetch('/filtr?crytid=' + input.value);
+                                let value1 = await response1.text();
+                                document.querySelector('#filtr_table').innerHTML = value1;
+                        });
+                    </script>
+                    <script>
+                        let inpuType = document.querySelector('#filtype');
+                        inpuType.addEventListener('input', async function() {
+                            let response = await fetch('/filtype?type=' + inpuType.value);
+                            let trainings = await response.json();
+                            let typ = trainings[0]["type"];
+                            html = '';
+                            html += '<option selected disabled>Choose exercise</option><option value="' + typ + '" >All exercises</option>';
+                            for (let t in trainings) {
+                                let name = trainings[t]["name"];
+                                let id = trainings[t]["id"];
+                                console.log(id);
+                                console.log(name);
+                                html += '<option value = "' + id + '">' + name + '</option>';
+                            }
+                            console.log(html);
+                            document.getElementById('filtr').innerHTML = html;
+                        });
+                    </script>
+                
             </div>
         </div>
-
+        
 {% endblock %}
