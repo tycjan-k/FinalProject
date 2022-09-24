@@ -6,13 +6,15 @@
 
 
 {% block main %}
-    <div class="container-fluid mt-3 mx-auto" style="width: 450px;">
+    <div class="container-fluid mt-3 mx-auto w-75">
         <form action="/new" method="post">
             <div class="mt-3 mb-3 form-group row">
                 <label class="col-sm-2 col-form-label">Type</label>
                 <div class="col-sm-10">
                     <select class="form-select" id="type" name="type">
                         <option selected disabled></option>
+                        <option>Push</option>
+                        <option>Pull</option>
                         <option>Shoulders</option>
                         <option>Biceps</option>
                         <option>Triceps</option>
@@ -21,6 +23,7 @@
                         <option>Legs</option>
                         <option>Back</option>
                         <option>Cardio</option>
+                        <option>Other</option>
                     </select>
                 </div>
             </div>
@@ -43,8 +46,6 @@
                         <option>Friday</option>
                         <option>Saturday</option>
                         <option>Sunday</option>
-                        <option>Every second day</option>
-                        <option>Every third day</option>
                     </select>
                 </div>
             </div>

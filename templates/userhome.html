@@ -8,7 +8,7 @@
     {% if tday %}
         <li class="nav-item mx-auto"> Today is <b>{{ day }}</b> {{ date }}, which means it is {% for t in tday %}<b>{{ t["type"] }} </b>{% endfor %} day! </li>
     {% else %}
-        <li class="nav-item mx-auto"> You have no trainings planned for today</li>
+        <li class="nav-item mx-auto"> Today is <b>{{ day }}</b> {{ date }}, you have no trainings planned for today</li>
     {% endif %}
 {% endblock %}
 
@@ -16,13 +16,45 @@
     <h2>
         Hello {{ username }}!
     </h2>
-    
+
+    <div class="container-fluid mx-auto">
         <form action="/new" method="get">
-            <button class="btn btn-secondary mt-3" type="submit">Create new training</button>
+            <button class="btn btn-secondary mt-3 w-75" type="submit">Create new training</button>
         </form>
-    <div class="container-fluid mt-3">
-        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#trainings" aria-expanded="false" aria-controls="trainings">
-                Your exercises
+    </div>
+
+        <div class="container-fluid mt-3 mx-auto">
+            <button class="btn btn-secondary w-75" type="button" data-bs-toggle="collapse" data-bs-target="#delete" aria-expanded="false" aria-controls="delete">
+                    Delete training
+            </button>
+            <div class="collapse" id="delete">
+                  
+                {% for Typ in user_types %}
+                    <div class="container-fluid">
+                        <button class="btn btn-new mt-3" type="button" data-bs-toggle="collapse" data-bs-target="#{{ Typ['type'] }}">{{ Typ["type"] }}</button> 
+                        
+                        {% for training in trainings %}
+                        {% if training["type"] == Typ["type"] %}
+                            <div class="collapse" id="{{ Typ['type'] }}">
+                                <form action="/delete" method="post">
+                                    <div class="container-fluid mt-3">
+                                        <input type="hidden" name="del_id" value="{{ training['id'] }}">
+                                        <button class="btn btn-newer" type="submit">{{ training["name"] }}</button>
+                                    </div>
+                                </form>
+                            </div>
+                        {% endif %}
+                        {% endfor %}
+                        
+                    </div>
+                {% endfor %}
+                        
+            </div>
+        </div>
+
+    <div class="container-fluid mt-3 mx-auto">
+        <button class="btn btn-secondary w-75" type="button" data-bs-toggle="collapse" data-bs-target="#trainings" aria-expanded="false" aria-controls="trainings">
+                Train
         </button>
         <div class="collapse" id="trainings">
               
@@ -37,22 +69,23 @@
                     
         </div>
     </div>
-        <div class="container-fluid mt-3">
-            <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#past" aria-expanded="false" aria-controls="past">
+
+        <div class="container-fluid mt-3 mx-auto">
+            <button class="btn btn-secondary w-75" type="button" data-bs-toggle="collapse" data-bs-target="#past" aria-expanded="false" aria-controls="past">
                 Your past trainings
             </button>
             <div class="collapse" id="past">
 
-                <select class="form-select mt-3 w-25 mx-auto" id="filtype">
+                <select class="form-select mt-3 w-75 mx-auto" id="filtype">
                     <option selected disabled>Choose exercise type</option>
                     <option value="all">All types</option>
                     {% for typ in user_types %}
-                    <option value="{{ typ['type'] }}">{{ typ['type'] }}</option>
+                    <option>{{ typ['type'] }}</option>
                     {% endfor %}
                 </select>
                 
                 <div class="container mt-3">
-                    <select class="form-select mt-3 w-25 mx-auto" id="filtr">
+                    <select class="form-select mt-3 w-75 mx-auto" id="filtr">
                         <option selected disabled>Choose exercise</option>
                     </select>
                     
@@ -68,6 +101,7 @@
                                 <th>Weight</th>
                                 <th>Repetitions</th>
                                 <th>Duration</th>
+                                <th>Notes</th>
                             </tr>
                             </thead>
                             <tbody id="filtr_table">
@@ -100,11 +134,8 @@
                             for (let t in trainings) {
                                 let name = trainings[t]["name"];
                                 let id = trainings[t]["id"];
-                                console.log(id);
-                                console.log(name);
                                 html += '<option value = "' + id + '">' + name + '</option>';
                             }
-                            console.log(html);
                             document.getElementById('filtr').innerHTML = html;
                         });
                     </script>

@@ -34,6 +34,14 @@ a:hover {
     background-color: #104080;
     color: white;
 }
+.btn-newer {
+    background-color: #6481a7;
+    color: white;
+}
+.btn-newer:hover {
+    background-color: #c43636;
+    color: white;
+}
 .table {
     border: 1px;
     border-color: white;

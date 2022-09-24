@@ -13,6 +13,7 @@
                         <td>{{ training["weight"] }} {{ training["unit"] }}</td>
                         <td>&times;{{ training["reps"] }}</td>
                         <td>{{ training["duration"] }} sec.</td>
+                        <td>{{ training["notes"] }}</td>
                     </tr>
                     {% if var.update({'first': false}) %}{% endif %}
                 {% else %}
@@ -20,6 +21,7 @@
                         <td>{{ training["weight"] }} {{ training["unit"] }}</td>
                         <td>&times;{{ training["reps"] }}</td>
                         <td>{{ training["duration"] }} sec.</td>
+                        <td>{{ training["notes"] }}</td>
                     </tr>
                 {% endif %}
             {% endif %}
