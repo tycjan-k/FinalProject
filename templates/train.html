@@ -7,6 +7,13 @@
 
 {% block main %}
 
+{% if error %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong> Please complete the form again.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
 <div class="container-fluid mt-3 mx-auto" style="width: 450px;">
     <form action="/train" method="post">
         <input type="hidden" name="type" value="{{ typ }}">

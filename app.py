@@ -159,23 +159,51 @@ def userhome():
 def train():
     # id comes from userhome via Your Trainings
     typ = request.args.get("type")
+    trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
+    error = None
 
     #POST route from train.html form
     if request.method == "POST":
+        #type
+        if not request.form.get("type"):
+            flash('Training cancelled, there was no training type provided.')
+            return redirect("/")
         typ = request.form.get("type")
+        trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
+        #name
+        if not request.form.get("name"):
+            error = 'You need to provide a name.'
+            return render_template("train.html", typ=typ, trainings=trainings, error=error)
         name = request.form.get("name")
+        #weight
+        if not request.form.get("weight"):
+            error = 'You need to provide a weight.'
+            return render_template("train.html", typ=typ, trainings=trainings, error=error)
         weight = request.form.get("weight")
+        #unit
+        if not request.form.get("unit"):
+            error = 'You need to provide a weight unit.'
+            return render_template("train.html", typ=typ, trainings=trainings, error=error)
         unit = request.form.get("unit")
+        #reps
+        if not request.form.get("reps"):
+            error = 'You need to provide a number of repetitions.'
+            return render_template("train.html", typ=typ, trainings=trainings, error=error)
         reps = request.form.get("reps")
+        #other data
         duration = request.form.get("duration")
         x = datetime.datetime.now()
         day = x.strftime("%A")
         tdate = datetime.date.today()
         note = request.form.get("note")
 
+        
         #get ID from trainings
         idt = db.execute("SELECT id FROM trainings WHERE type = ? AND name = ?", typ, name)
         idt = idt[0]['id']
+        if not idt:
+            error = 'Something went wrong, ID is empty.'
+            return render_template("train.html", typ=typ, trainings=trainings, error=error)
 
         #sets
         sets = db.execute("SELECT COUNT(*) FROM exercises WHERE user_id = ? AND name = ? AND tdate = ?", session["user_id"], name, tdate)
@@ -192,16 +220,29 @@ def train():
         flash('Set added')
 
     #GET route from userhome or any other
-
-    trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", session["user_id"], typ)
     return render_template("train.html", typ=typ, trainings=trainings)
 
 @app.route("/new", methods=["GET", "POST"])
 @login_required
 def new():
+    #empty error message
+    error = None
+
+    #Form
     if request.method == "POST":
+
+        #type NOT NULL
+        if not request.form.get("type"):
+            error = 'You need to provide the type.'
+            return render_template("new.html", error=error)
         typ = request.form.get("type")
+
+        #name NOT NULL
+        if not request.form.get("name"):
+            error = 'You need to provide the name.'
+            return render_template("new.html", error=error)
         name = request.form.get("name")
+
         training_day = request.form.get("training_day")
         db.execute("INSERT INTO trainings (user_id, type, name, training_day) VALUES (?,?,?,?)", session["user_id"], typ, name, training_day)
         return redirect("/")
