@@ -272,8 +272,10 @@ def filtype():
     # return trainings filtered by types
     user = session["user_id"]
     typ = request.args.get("type")
+    #jeśli typ otrzymany typ to 'all' zwróć wszystkie treningi usera
     if typ == 'all':
         trainings = db.execute("SELECT * FROM trainings WHERE user_id = ?", user)
+        #zmiana jednego na 'all' pozwala wybrać wszystkie danego typu. Nie szkodzi wypisaniu danych z trainings bo potrzebne są tylko 'name' i 'id'
         trainings[0]["type"] = 'all'
     else:
         trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", user, typ)
@@ -286,3 +288,49 @@ def delete():
     db.execute("DELETE FROM trainings WHERE id = ?", idt)
     flash('Training Deleted')
     return redirect("/")
+
+@app.route("/progressroute")
+def progressroute():
+    #get tid of the training
+    p_id = request.args.get("progress_id")
+    #all exercises if this type
+    exercise = db.execute("SELECT * FROM exercises WHERE idt = ? ORDER BY tdate", p_id)
+    #daily sum of weight and reps of this type of exercise
+    sum_weight = db.execute("SELECT sum(weight) FROM exercises WHERE idt = ? GROUP BY tdate", p_id)
+    sum_reps = db.execute("SELECT sum(reps) FROM exercises WHERE idt = ? GROUP BY tdate", p_id)
+    #dates of this type of exercise
+    dates = db.execute("SELECT distinct tdate FROM exercises WHERE idt = ?", p_id)
+    #number of days (trainings)
+    ex_number = len(dates)
+
+    table = []
+    maxw = 0
+    maxr = 0
+    #look for daily progress
+    for i in range(ex_number):
+        date = dates[i]["tdate"]
+        weight = sum_weight[i]["sum(weight)"]
+        if weight > maxw:
+            maxw = weight
+            w = 1
+        elif weight == maxw:
+            w = 0
+        else:
+            w = -2
+        reps = sum_reps[i]["sum(reps)"]
+        if reps > maxr:
+            maxr = reps
+            r = 1
+        elif reps == maxr:
+            r = 0
+        else:
+            r = -2
+
+        val = r + w
+        if val == -1:
+            maxw = weight
+            maxr = reps
+        table.append({'date':date, 'weight':weight, 'reps':reps, 'val':val})
+    return render_template("progress.html", table=table)
+
+        

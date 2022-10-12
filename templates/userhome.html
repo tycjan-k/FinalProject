@@ -142,5 +142,50 @@
                 
             </div>
         </div>
+
+        <div class="container-fluid mt-3 mx-auto">
+            <button class="btn btn-secondary w-75" type="button" data-bs-toggle="collapse" data-bs-target="#progress" aria-expanded="false" aria-controls="progress">
+                Progress tracker
+            </button>
+            <div class="collapse" id="progress">
+
+                <select class="form-select mt-3 w-75 mx-auto" id="progress_id">
+                    <option selected disabled>Choose exercise</option>
+                    {% for training in trainings %}
+                    <option value="{{ training['id'] }}">{{ training['type'] }} - {{ training['name'] }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="mt-3 table-responsive">
+                    <table class="mx-auto table table-bordered table-striped table-dark">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Weight sum</th>
+                            <th>Repetitions sum</th>
+                            <th>Achieved progress</th>
+                        </tr>
+                        </thead>
+                        <tbody id="progress_table">
+                           
+                            
+                        </tbody>
+                    </table>
+                
+                </div>
+            </div>
+        </div>
+
+
+        <script>
+            let progress_input = document.querySelector('#progress_id');
+                progress_input.addEventListener('input', async function() {
+                    let progress_response = await fetch('/progressroute?progress_id=' + progress_input.value);
+                    let progress_html = await progress_response.text();
+                    document.querySelector('#progress_table').innerHTML = progress_html;
+            });
+        </script>
+
+        
         
 {% endblock %}
