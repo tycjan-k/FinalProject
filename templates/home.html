@@ -6,8 +6,8 @@
 
 {% block navbar %}
     
-        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home">Home</a></li>
         <li class="nav-item"><a class="nav-link " href="/login">Log in</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="/home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
     
 {% endblock %}
@@ -15,9 +15,40 @@
 {% block main %}
     <div class="justify-content-center align-items-center">
     
-        <h3>To jest główny block main</h3>
-        <h5> To do something you need to <a class="link" href="/login">log in</a>. </h5>
+        <h1 class="display-6">Gym book</h1>
+        <p class="lead">It's your gym notebook that allows you to keep track of your workouts in orderly and systematic way.</p>
+        
+        <p class="lead"> If you already have an account <a class="link" href="/login">log in</a>, or else go and  <a class="link" href="/register">register</a> right now. </p>
     
+        <p>
+            <button class="btn btn-outline-secondary w-25" type="button" data-bs-toggle="collapse" data-bs-target="#howto" aria-expanded="false" aria-controls="howto">
+                How it works?
+            </button>
+        </p>
+        <div class="collapse" id="howto">
+            
+                <ul class="list-group mt-5">
+                    <p class="fs-4 mb-1">Create a workout</p>
+                    <li class="list-group-item">Choose training type</li>
+                    <li class="list-group-item">Name your exercise</li>
+                    <li class="list-group-item">Set a workout day</li>
+                </ul>
+            
+                <ul class="list-group mt-5">
+                    <p class="fs-4 mb-1">Train</p>
+                    <li class="list-group-item">Choose a workout</li>
+                    <li class="list-group-item">Save your results in weight, duration and repetitions made</li>
+                </ul>
+
+                <ul class="list-group mt-5">
+                    <p class="fs-4 mb-1">Track your workouts</p>
+                    <li class="list-group-item">Easy view of all of your previous trainings</li>
+                    <li class="list-group-item">Filter by type of workout or look for a specific exercise</li>
+                    <li class="list-group-item">Track your day by day progress</li>
+                </ul>
+                
+        </div>
+        
     </div>
 
 {% endblock %}

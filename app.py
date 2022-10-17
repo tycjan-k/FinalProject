@@ -40,37 +40,49 @@ def home():
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
-    #Empty error message
-    error = None
-
     #User reached route via POST (clicking on a button with a post method)
     if request.method == "POST":
 
         #Require username
         if not request.form.get("username"):
-            error = 'You did not provide an username'
+            error = True
+            flash('You did not provide an username')
             return render_template("register.html", error=error)
         #Look if username is taken and apologize if it is
         lookusname = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
         if len(lookusname) != 0:
-            error = 'Username is already taken'
+            error = True
+            flash('Username is already taken')
             return render_template("register.html", error=error)
         else:
             username = request.form.get("username")
 
         #Require password
         if not request.form.get("password"):
-            error = 'You did not provide a password'
+            error = True
+            flash('You did not provide a password')
             return render_template("register.html", error=error)
         password = request.form.get("password")
 
-        #Confirm password and add it to the users table
+        #Confirm password
         confirmation = request.form.get("confirmation")
         if password != confirmation:
-            error = 'Passwords do not match'
+            error = True
+            flash('Passwords do not match')
             return render_template("register.html", error=error)
+
+        #question and answer
+        if request.form.get("question") and request.form.get("answer"):
+            question = request.form.get("question")
+            answer = request.form.get("answer")
+            db.execute("INSERT INTO users (username, hash, question, answer) VALUES (?, ?, ?, ?)", username, generate_password_hash(password), question, answer)
+        #Neither
         else:
-            db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", username, generate_password_hash(password))
+            error = True
+            flash('You need to provide safety question')
+            return render_template("register.html", error=error)
+
+        
         # Redirect user to home page
         flash('You successfully registered')
         return redirect("/home")
@@ -84,20 +96,20 @@ def login():
     # Forget any user_id
     session.clear()
 
-    #create empty error message 
-    error = None
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            error = 'Empty username field'
+            error = True
+            flash('Empty username field')
             return render_template("login.html", error=error)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            error = 'Empty password field'
+            error = True
+            flash('Empty password field')
             return render_template("login.html", error=error)
 
         # Query database for username
@@ -105,14 +117,20 @@ def login():
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            error = 'Wrong username or password'
+            error = True
+            flash('Wrong username or password')
             return render_template("login.html", error=error)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
 
-        # Redirect user to home page
-        flash('you logged in')
+
+        # Greet the user
+        user = session["user_id"]
+        username = db.execute("SELECT username FROM users WHERE id = ?", user)
+        session["username"] = username[0]["username"]
+
+        flash('Welcome ' + session["username"] + '!')
         return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
@@ -132,11 +150,8 @@ def logout():
 @login_required
 def userhome():
     """ user homepage """
-    # Greet the user
+    
     user = session["user_id"]
-    username = db.execute("SELECT username FROM users WHERE id = ?", user)
-    session["username"] = username[0]["username"]
-
     #Get the current day and date
     x = datetime.datetime.now()
     day = x.strftime("%A")
@@ -151,7 +166,7 @@ def userhome():
     trainings = db.execute("SELECT * FROM trainings WHERE user_id = ?", user)
     
     return render_template("userhome.html", date=date, day=day, tday=tday, 
-    username=session["username"], user_types=user_types, trainings=trainings)
+    user_types=user_types, trainings=trainings)
 
 
 @app.route("/train", methods=["GET", "POST"])
@@ -249,6 +264,7 @@ def new():
     return render_template("new.html")
 
 @app.route("/filtr")
+@login_required
 def filtr():
     #return table data based of filtered training id
     user = session["user_id"]
@@ -268,6 +284,7 @@ def filtr():
     return render_template("filtr.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
 
 @app.route("/filtype")
+@login_required
 def filtype():
     # return trainings filtered by types
     user = session["user_id"]
@@ -282,6 +299,7 @@ def filtype():
     return jsonify(trainings)
 
 @app.route("/delete", methods=["POST"])
+@login_required
 def delete():
     #deleting the chosen training based on chosen ID
     idt = request.form.get("del_id")
@@ -290,6 +308,7 @@ def delete():
     return redirect("/")
 
 @app.route("/progressroute")
+@login_required
 def progressroute():
     #get tid of the training
     p_id = request.args.get("progress_id")
@@ -330,7 +349,112 @@ def progressroute():
         if val == -1:
             maxw = weight
             maxr = reps
+        if i == 0:
+            val = 10
         table.append({'date':date, 'weight':weight, 'reps':reps, 'val':val})
     return render_template("progress.html", table=table)
 
-        
+@app.route("/newq", methods=["GET", "POST"])
+@login_required
+def newq():
+    #changing the security code/question
+    if request.method == "POST":
+        #question and answer
+        if request.form.get("question") and request.form.get("answer"):
+            question = request.form.get("question")
+            answer = request.form.get("answer")
+            db.execute("UPDATE users SET question = ?, answer = ? WHERE id = ?", question, answer, session["user_id"])
+        #Neither of code, question and answer
+        else:
+            error = True
+            flash('You need to provide question and answer')
+            return render_template("newq.html", error=error)
+        # Redirect user to home page
+        flash('You successfully changed your settings')
+        return redirect("/")
+
+    #get route
+    return render_template("newq.html")
+
+@app.route("/who", methods=["GET", "POST"])
+def who():
+    if request.method == "POST":
+        #didnt provide username
+        if not request.form.get("username"):
+            error = True
+            flash('You need to provide username')
+            return render_template("who.html", error=error)
+        username = request.form.get("username")
+        return redirect("/forgot?username=" + username)
+    #get route
+    return render_template("who.html")
+
+@app.route("/forgot", methods=["GET", "POST"])
+def forgot():
+    #resetting password feature
+    if request.method == "POST":
+        #didnt provide username
+        if not request.form.get("username"):
+            error = True
+            flash('You need to provide username')
+            return render_template("forgot.html", error=error)
+        username = request.form.get("username")
+
+        #didnt provide neither answer
+        if not request.form.get("answer"):
+            error = True
+            flash('You need to provide answer to the question')
+            return render_template("forgot.html", error=error)
+        #answer
+        if request.form.get("answer"):
+            answer = request.form.get("answer")
+        else:
+            answer = NULL
+        answer_text = db.execute("SELECT answer FROM users WHERE username = ?", username)
+        answer_text = answer_text[0]["answer"]
+        #if correct log the user
+        if answer_text == answer:
+            # Query database for username
+            rows = db.execute("SELECT * FROM users WHERE username = ?", username)
+            # Remember which user has logged in
+            session["user_id"] = rows[0]["id"]
+            # Greet the user
+            user = session["user_id"]
+            username = db.execute("SELECT username FROM users WHERE id = ?", user)
+            session["username"] = username[0]["username"]
+            #redirect to set new password
+            return redirect("/newpass")
+        else:
+            error = True
+            flash('Wrong answer')
+            return render_template("forgot.html")
+    
+    #Get route
+    username = request.args.get("username")
+    question = db.execute("SELECT question FROM users WHERE username = ?", username)
+    question = question[0]["question"]
+    return render_template("forgot.html", username=username, question=question)
+
+@app.route("/newpass", methods=["GET", "POST"])
+@login_required
+def newpass():
+    if request.method == "POST":
+        if not (request.form.get("password") and request.form.get("confirmation")):
+            error = True
+            flash('You need to provide new password')
+            return render_template("newpass.html", error=error)
+        password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
+        if password != confirmation:
+            error = True
+            flash('Password and confirmation need to match!')
+            return render_template("newpass.html", error=error)
+        db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(password), session["user_id"])
+        return redirect("/")
+
+    return render_template("newpass.html")
+
+@app.route("/myaccount", methods=["GET"])
+@login_required
+def myaccount():
+    return render_template("myaccount.html")

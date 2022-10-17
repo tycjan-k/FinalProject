@@ -6,17 +6,14 @@
 
 {% block navbar %}
     
-        <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
         <li class="nav-item"><a class="nav-link" href="/login">Log in</a></li>
+        <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
         <li class="nav-item"><a class="nav-link active" aria-current="page" href="/register">Register</a></li>
     
 {% endblock %}
 
 {% block main %}
 
-    {% if error %}
-        <p class="error">Error: {{ error }}</p>
-    {% endif %}
 
     <div class="container-fluid mt-3">
         <form action="/register" method="post">
@@ -29,6 +26,16 @@
             <div class="mb-3">
                 <input class="form-control mx-auto w-auto" id="confirmation" name="confirmation" placeholder="Confirm password" type="password">
             </div>
+            <p class="mb-2">
+                Choose your password reset question and answer:
+            </p>
+              <div class="mb-3">
+               
+                    <input class="form-control mx-auto w-auto mb-2" id="question" name="question" placeholder="Safety question" type="text">
+                    <input class="form-control w-auto mx-auto" id="answer" name="answer" placeholder="Answer" type="password">
+                
+              </div>
+
             <button class="btn btn-secondary" type="submit">Register</button>
         </form>
     </div>

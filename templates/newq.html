@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    New question
+{% endblock %}
+
+
+{% block main %}
+
+   
+
+    <div class="container-fluid mt-3">
+        <form action="/newq" method="post">
+            <p>Enter new safety question:</p>
+            <input class="form-control mx-auto w-auto mb-2" id="question" name="question" placeholder="Safety question" type="text">
+            <input class="form-control w-auto mx-auto mb-3" id="answer" name="answer" placeholder="Answer" type="password">
+
+            <button class="btn btn-secondary" type="submit">Save</button>
+        </form>
+    </div>
+
+
+{% endblock %}
