@@ -25,7 +25,7 @@
                     {% if session["user_id"] %}
                         
                         <a class="navbar-brand" href="/">
-                            <span class="white fs-3">Gym book</span>
+                            <span class="white fs-3">Gym Note</span>
                         <a>
                         <ul class="nav nav-pills">
                             <li class="nav-item"><a class="nav-link white" aria-current="page" href="/myaccount">My account</a></li>
@@ -40,7 +40,7 @@
                 </div>
             </nav>
         
-        <div class="container-fluid text-center w-25 mt-3 mb-3">
+        <div class="container-md text-center mt-3 mb-3">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     <ul class="flashes no-bullets">
@@ -67,12 +67,12 @@
         </div>
 
 
-        <main class="container-fluid text-center w-75">
+        <main class="container-md text-center">
             {% block main %}{% endblock %}
         </main>
 
         <footer class="mt-5 small text-center text-muted">
-           Gym book
+           Gym Note
         </footer>
     </body>
 

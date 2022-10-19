@@ -247,10 +247,18 @@ def new():
     if request.method == "POST":
 
         #type NOT NULL
-        if not request.form.get("type"):
+        if (not request.form.get("type")) and (not request.form.get("custom_type")):
             error = 'You need to provide the type.'
             return render_template("new.html", error=error)
-        typ = request.form.get("type")
+        elif (request.form.get("type") and request.form.get("custom_type")):
+            error = 'You can only provide one type.'
+            return render_template("new.html", error=error)
+        elif request.form.get("type"):
+            typ = request.form.get("type")
+        elif request.form.get("custom_type"):
+            typ = request.form.get("custom_type")
+        else:
+            error = 'Type not provided'
 
         #name NOT NULL
         if not request.form.get("name"):

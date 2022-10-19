@@ -14,7 +14,7 @@
 </div>
 {% endif %}
 
-<div class="container-fluid mt-3 mx-auto w-25">
+<div class="container-sm mt-3 mx-auto" style="max-width:450px">
     <form action="/train" method="post">
         <input type="hidden" name="type" value="{{ typ }}">
 
@@ -23,8 +23,8 @@
         </div>
 
         <div class="mt-3 mb-3 form-group row">
-            <label class="col-sm-2 col-form-label">Name</label>
-            <div class="col-sm-10">
+            <label class="col-sm-4 col-form-label">Name</label>
+            <div class="col-sm-8">
                 <select class="form-select" id="name" name="name">
                     <option selected disabled>Choose exercise</option>
                     {% for training in trainings %}
@@ -34,10 +34,14 @@
             </div>
         </div>
 
-        <div class="mt-3 form-group row">
+        <div class="mt-3 row">
             <label class="col-sm-4 col-form-label">Weight</label>
-            <div class="col-sm-8">
-                <input  class="form-control" id="weight" name="weight" placeholder="Weight" type="number" min="1">
+            <div class="col-sm-4">
+                <input  class="form-control" id="weight" name="weight" placeholder="Weight" type="number" min="1" >
+            </div>
+            
+            <div class="col-sm-4">
+                <span class="input-group-text fw-light text-wrap" style="font-size: 0.75em;">For bodyweight exercise enter 1</span>
             </div>
         </div>
 
