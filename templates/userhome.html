@@ -116,7 +116,7 @@
                     <script>
                         let input = document.querySelector('#filtr');
                             input.addEventListener('input', async function() {
-                                let response1 = await fetch('/filtr?crytid=' + input.value);
+                                let response1 = await fetch('/filtr?cryt_type=' + input.value);
                                 let value1 = await response1.text();
                                 document.querySelector('#filtr_table').innerHTML = value1;
                         });
@@ -159,7 +159,7 @@
                         <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Weight sum</th>
+                            <th>Weight average</th>
                             <th>Repetitions sum</th>
                             <th>Achieved progress</th>
                         </tr>

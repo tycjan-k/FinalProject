@@ -274,22 +274,22 @@ def new():
 @app.route("/filtr")
 @login_required
 def filtr():
-    #return table data based of filtered training id
+    #return table data based of filtered training type
     user = session["user_id"]
     user_table = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY id DESC", user)
-    user_trens = db.execute("SELECT DISTINCT idt, type, name, tdate, sets FROM exercises WHERE user_id = ?", user)
-    crytid = request.args.get("crytid")
-    if crytid == 'all':
-        return render_template("all.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
+    user_trens = db.execute("SELECT DISTINCT idt, type, name, tdate, sets FROM exercises WHERE user_id = ? ORDER BY tdate DESC", user)
+    cryt_type = request.args.get("cryt_type")
+    if cryt_type == 'all':
+        return render_template("all.html", user_table=user_table, user_trens=user_trens, cryt_type=cryt_type)
 
-    #if id == type, then return all the exercises of a given type
+    #if cryt_type == type, then return all the exercises of a given type
     for training in user_trens:
-        if crytid == training["type"]:
-            return render_template("all.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
+        if cryt_type == training["type"]:
+            return render_template("all.html", user_table=user_table, user_trens=user_trens, cryt_type=cryt_type)
 
-    #if id is a concrete exercise return just this exercise
-    crytid = int(crytid)
-    return render_template("filtr.html", user_table=user_table, user_trens=user_trens, crytid=crytid)
+    #if id is a concrete exercise id return just this exercise
+    cryt_type = int(cryt_type)
+    return render_template("filtr.html", user_table=user_table, user_trens=user_trens, cryt_type=cryt_type)
 
 @app.route("/filtype")
 @login_required
@@ -320,47 +320,58 @@ def delete():
 def progressroute():
     #get tid of the training
     p_id = request.args.get("progress_id")
-    #all exercises if this type
-    exercise = db.execute("SELECT * FROM exercises WHERE idt = ? ORDER BY tdate", p_id)
     #daily sum of weight and reps of this type of exercise
-    sum_weight = db.execute("SELECT sum(weight) FROM exercises WHERE idt = ? GROUP BY tdate", p_id)
-    sum_reps = db.execute("SELECT sum(reps) FROM exercises WHERE idt = ? GROUP BY tdate", p_id)
+    avg_weight = db.execute("SELECT avg(weight) FROM exercises WHERE idt = ? GROUP BY tdate ORDER BY tdate DESC", p_id)
+    sum_reps = db.execute("SELECT sum(reps) FROM exercises WHERE idt = ? GROUP BY tdate ORDER BY tdate DESC", p_id)
     #dates of this type of exercise
-    dates = db.execute("SELECT distinct tdate FROM exercises WHERE idt = ?", p_id)
+    dates = db.execute("SELECT distinct tdate FROM exercises WHERE idt = ? ORDER BY tdate DESC", p_id)
     #number of days (trainings)
     ex_number = len(dates)
 
     table = []
-    maxw = 0
-    maxr = 0
+    pbest = 0
+    best_date = 0
     #look for daily progress
     for i in range(ex_number):
+        #if its the last on the list (first ever exercise of this type)
+        if i == ex_number-1:
+            val = 10
+            date = dates[i]["tdate"]
+            weight = avg_weight[i]["avg(weight)"]
+            reps = sum_reps[i]["sum(reps)"]
+            #personal best
+            if weight*reps > pbest:
+                pbest = weight*reps
+                best_date = date
+            table.append({'date':date, 'weight':weight, 'reps':reps, 'val':val})
+            return render_template("progress.html", table=table, best_date=best_date)
+        #else compare to the next on the list (previous exercise in real time)
         date = dates[i]["tdate"]
-        weight = sum_weight[i]["sum(weight)"]
-        if weight > maxw:
-            maxw = weight
+        weight = avg_weight[i]["avg(weight)"]
+        prev_weight = avg_weight[i+1]["avg(weight)"]
+        if weight > prev_weight:
             w = 1
-        elif weight == maxw:
+        elif weight == prev_weight:
             w = 0
         else:
             w = -2
         reps = sum_reps[i]["sum(reps)"]
-        if reps > maxr:
-            maxr = reps
+        prev_reps = sum_reps[i+1]["sum(reps)"]
+        if reps > prev_reps:
             r = 1
-        elif reps == maxr:
+        elif reps == prev_reps:
             r = 0
         else:
             r = -2
-
         val = r + w
-        if val == -1:
-            maxw = weight
-            maxr = reps
-        if i == 0:
-            val = 10
+        #personal best
+        if weight*reps > pbest:
+            pbest = weight*reps
+            best_date = date
+
         table.append({'date':date, 'weight':weight, 'reps':reps, 'val':val})
-    return render_template("progress.html", table=table)
+    #should not be needed 
+    #return render_template("progress.html", table=table, best_date=best_date)
 
 @app.route("/newq", methods=["GET", "POST"])
 @login_required

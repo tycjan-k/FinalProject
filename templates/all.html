@@ -1,5 +1,5 @@
 {% for daytren in user_trens %}
-    {% if daytren['type'] == crytid or crytid == 'all' %}
+    {% if daytren['type'] == cryt_type or cryt_type == 'all' %}
         {% set var = {'first': true} %}
         <tr>
             <td rowspan="{{ daytren['sets'] }}">{{ daytren["type"] }}</td>

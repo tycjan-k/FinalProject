@@ -4,11 +4,12 @@
     <td>{{ day["weight"] }}</td>
     <td>{{ day["reps"] }}</td>
     <td>
-        {% if day["val"] == 1 %} <i class="bi bi-emoji-heart-eyes"></i> Progress
+        {% if day["val"] == 10 %} <i class="bi bi-emoji-sunglasses"></i> Good start!
+        {% elif day["date"] == best_date %} <i class="bi bi-patch-exclamation"></i> Personal best <i class="bi bi-patch-exclamation"></i>
         {% elif day["val"] == 2 %} <i class="bi bi-emoji-heart-eyes"></i><i class="bi bi-emoji-heart-eyes"></i> Double progress!
         {% elif day["val"] == 0 %} <i class="bi bi-emoji-smile"></i> Kept level
         {% elif day["val"] == -1 %} <i class="bi bi-emoji-smile-upside-down"></i> Mix up
-        {% elif day["val"] == 10 %} <i class="bi bi-emoji-sunglasses"></i> Good start!
+        {% elif day["val"] == 1 %} <i class="bi bi-emoji-heart-eyes"></i> Progress
         {% else %} <i class="bi bi-emoji-frown"></i> Regress
         {% endif %}
     </td>
