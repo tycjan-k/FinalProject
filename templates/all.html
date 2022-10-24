@@ -10,7 +10,12 @@
             {% if training["tdate"] == daytren["tdate"] and training["name"] == daytren["name"] %}
                 {% if var['first'] %}
                     
-                        <td>{{ training["weight"] }} {{ training["unit"] }}</td>
+                        <td> 
+                            {% if training["unit"] != 'bodyweight' %}
+                                {{ training["weight"] }}
+                            {% endif %}
+                            {{ training["unit"] }}
+                        </td>
                         <td>&times;{{ training["reps"] }}</td>
                         <td>{% if training["duration"] %}{{ training["duration"] }} sec.
                             {% else %} Not given.
@@ -20,7 +25,12 @@
                     {% if var.update({'first': false}) %}{% endif %}
                 {% else %}
                     <tr>
-                        <td>{{ training["weight"] }} {{ training["unit"] }}</td>
+                        <td>
+                            {% if training["unit"] != 'bodyweight' %}
+                                {{ training["weight"] }}
+                            {% endif %}
+                            {{ training["unit"] }}
+                        </td>
                         <td>&times;{{ training["reps"] }}</td>
                         <td>{% if training["duration"] %}{{ training["duration"] }} sec.
                             {% else %} Not given.

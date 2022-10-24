@@ -2,6 +2,24 @@ body {
     background-color: black;
     color: white;
 }
+.wrap {
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .bg {
+    opacity: 0.4;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+  }
+  
+  .content {
+    position: relative;
+  }
+
 .nav-pills .nav-link.active {
     color: #fff;
     background-color: #555555;
@@ -57,4 +75,7 @@ td {
     background-color: black;
     color: white;
     border-color: grey;
+}
+.btn-outline-secondary {
+    color: white;
 }

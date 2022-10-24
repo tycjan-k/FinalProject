@@ -39,41 +39,50 @@
                     {% endif %}
                 </div>
             </nav>
+        <div class="wrap">
+            <picture class="bg">
+                <source srcset="https://images.pexels.com/photos/4164772/pexels-photo-4164772.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" media="(max-width:550px)">
+                <source srcset='https://images.pexels.com/photos/4162451/pexels-photo-4162451.jpeg'>
+                <img src='https://images.pexels.com/photos/4162451/pexels-photo-4162451.jpeg' style="width:100%">
+            </picture>
+            <div class="content">
+                <div class="container-md text-center mt-3 mb-3">
+                        {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                                <ul class="flashes no-bullets">
+                                {% for message in messages %}
+                                    {% if error == True %}
+                                    <li>
+                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    </li>
+                                    {% else %}
+                                    <li>
+                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                        </div>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endwith %}
+                </div>
+
+                <main class="container-md text-center mb-4">
+                    {% block main %}{% endblock %}
+                
+                </main>
         
-        <div class="container-md text-center mt-3 mb-3">
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul class="flashes no-bullets">
-                    {% for message in messages %}
-                        {% if error == True %}
-                        <li>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        </li>
-                        {% else %}
-                        <li>
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        </li>
-                        {% endif %}
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
+            </div>
         </div>
-
-
-        <main class="container-md text-center">
-            {% block main %}{% endblock %}
-        </main>
-
-        <footer class="mt-5 small text-center text-muted">
-           Gym Note
+        <footer class="mt-3 small text-center text-muted">
+            Gym Note
         </footer>
+            
     </body>
 
 </html>
