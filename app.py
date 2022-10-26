@@ -79,7 +79,7 @@ def register():
         #Neither
         else:
             error = True
-            flash('You need to provide safety question')
+            flash('You need to provide security question')
             return render_template("register.html", error=error)
 
         
@@ -157,7 +157,7 @@ def userhome():
     day = x.strftime("%A")
     date = datetime.date.today()
 
-    
+    #get the trainings for today's date
     tday = db.execute("SELECT DISTINCT type FROM trainings WHERE user_id = ? AND training_day = ?", user, day)
     
 
@@ -297,10 +297,10 @@ def filtype():
     # return trainings filtered by types
     user = session["user_id"]
     typ = request.args.get("type")
-    #jeśli typ otrzymany typ to 'all' zwróć wszystkie treningi usera
+    #if the returned type is 'all' return all of the user's trainings
     if typ == 'all':
         trainings = db.execute("SELECT * FROM trainings WHERE user_id = ?", user)
-        #zmiana jednego na 'all' pozwala wybrać wszystkie danego typu. Nie szkodzi wypisaniu danych z trainings bo potrzebne są tylko 'name' i 'id'
+        #Chaning the first one to 'all' allows for choosing all of a given type. It doesn't change any data from trainings because only 'name' and 'id' are required.
         trainings[0]["type"] = 'all'
     else:
         trainings = db.execute("SELECT * FROM trainings WHERE user_id = ? AND type = ?", user, typ)
@@ -312,6 +312,7 @@ def delete():
     #deleting the chosen training based on chosen ID
     idt = request.form.get("del_id")
     db.execute("DELETE FROM trainings WHERE id = ?", idt)
+    db.execute("DELETE FROM exercises WHERE idt = ?", idt)
     flash('Training Deleted')
     return redirect("/")
 
@@ -370,8 +371,9 @@ def progressroute():
             best_date = date
 
         table.append({'date':date, 'weight':weight, 'reps':reps, 'val':val})
-    #should not be needed 
-    #return render_template("progress.html", table=table, best_date=best_date)
+    #if something went wrong
+    flash('Something went wrong')
+    return render_template("progress.html")
 
 @app.route("/newq", methods=["GET", "POST"])
 @login_required
