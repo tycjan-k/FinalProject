@@ -5,8 +5,8 @@ from flask import Flask, flash, redirect, render_template, request, session, jso
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from helpers import login_required
+from flask import redirect, session
+from functools import wraps
 
 import time
 import datetime
@@ -24,6 +24,15 @@ Session(app)
 
 # Configure CS50 Library to use SQLite database
 db = SQL("sqlite:///fp.db")
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get("user_id") is None:
+            return redirect("/login")
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.after_request
 def after_request(response):
@@ -375,27 +384,6 @@ def progressroute():
     flash('Something went wrong')
     return render_template("progress.html")
 
-@app.route("/newq", methods=["GET", "POST"])
-@login_required
-def newq():
-    #changing the security code/question
-    if request.method == "POST":
-        #question and answer
-        if request.form.get("question") and request.form.get("answer"):
-            question = request.form.get("question")
-            answer = request.form.get("answer")
-            db.execute("UPDATE users SET question = ?, answer = ? WHERE id = ?", question, answer, session["user_id"])
-        #Neither of code, question and answer
-        else:
-            error = True
-            flash('You need to provide question and answer')
-            return render_template("newq.html", error=error)
-        # Redirect user to home page
-        flash('You successfully changed your settings')
-        return redirect("/")
-
-    #get route
-    return render_template("newq.html")
 
 @app.route("/who", methods=["GET", "POST"])
 def who():
@@ -444,7 +432,7 @@ def forgot():
             username = db.execute("SELECT username FROM users WHERE id = ?", user)
             session["username"] = username[0]["username"]
             #redirect to set new password
-            return redirect("/newpass")
+            return redirect("/myaccount")
         else:
             error = True
             flash('Wrong answer')
@@ -456,10 +444,15 @@ def forgot():
     question = question[0]["question"]
     return render_template("forgot.html", username=username, question=question)
 
-@app.route("/newpass", methods=["GET", "POST"])
+@app.route("/password", methods=["POST"])
+@login_required
+def auth():
+    return render_template("newpass.html")
+
+
+@app.route("/newpass", methods=["POST"])
 @login_required
 def newpass():
-    if request.method == "POST":
         if not (request.form.get("password") and request.form.get("confirmation")):
             error = True
             flash('You need to provide new password')
@@ -473,9 +466,10 @@ def newpass():
         db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(password), session["user_id"])
         return redirect("/")
 
-    return render_template("newpass.html")
 
 @app.route("/myaccount", methods=["GET"])
 @login_required
 def myaccount():
-    return render_template("myaccount.html")
+    question = db.execute("SELECT question FROM users WHERE username = ?", session["username"])
+    question = question[0]["question"]
+    return render_template("myaccount.html", question=question)

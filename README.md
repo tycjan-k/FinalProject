@@ -1,10 +1,15 @@
 # CS50's Final Project: Gym Note
-### Video Demo: 
+### Video Demo: https://youtu.be/rFuK-BquJYA
 ### Idea 
 The idea for Gym Note came from practical need for an easy and intuitive but also complete and precise way to track exercises throughout gym sessions. 
 Many people, while in gym, have their personal notebooks or use simple notebook apps on their phones to write down their exercises. The advantage of such
 solutions are mainly the ease of usage and freedom in creating personal customization.
 This web app allows to keep those advantages, so every user can make it work for their personal needs, and in the same time it offers more organised way to save entries and presents all necessary data without unnecessary distractions. 
+### Choices made
+Collapse buttons are often used, so instead of going to another page, the user can stay on the one he is currently on. It's more intuitive and smooth desing choice, especially for user expierence on mobile devices.
+The whole 'forgot password' route is based on security question, which is a bit old but also very simple solution. It acts as a secondary password and is a quick way of accessing the account when the original password is forgotten. Sending the reset link to e-mail addres might be implemented in the later versions if the website is launched online.
+When logged in the user can change his password and remind himself the security question. For safety reasons it's impossible to change the security question, so it's always a viable method to log into account even if password was corrupted or unwillingly changed.
+Progress tracker compares average weight of every exercise and sum of repetitions made so it works best when with every workout one keeps the same amount of sets and progresses linearly. If it's not user's personal best result, but one of the values goes up and the other goes down, then it's displayed as a 'Mix up' to indicate change in a workout format.
 ### Code and template structure.
 The main building blocks for this app are HTML and Python. Front-end is based on Bootstrap, from which various classes have found usage in creating the visual side of the site. Some changes to CSS were made in order to make the site more visible and aesthetically pleasing. Dark theme was chosen in order to make it more eye friendly. Everything is responsive to user's device and keeps all of the functionalities accessible irrespectively of the device's size. More about it can be found in demonstration video linked above.
 Back-end is based mainly on Flask which among others takes care of template rendering, redirecting user to the proper page and keeping user's data in a session to allow more feature to be possible after logging in. CS50's library is also used to operate on database using SQLite queries. Workzeug's library allows for making the app more secure and keeps users passwords in the database in a hashed format. 
@@ -24,7 +29,7 @@ Both functions are complementary to each other. They allow for two step filterin
 It's a function used to create a table informing the user whether or not he has made a progress in his workouts. After getting the request from website's JavaScript with a training ID in it, the function then calculates and compares all of the previous results of this training. To each training day it assigns a value 'val' ensuing from the weight and repetitions made on a given day compared to the previous one. It also assigns different value to user's first training and to his best one. Value is returned to the webiste, along with the training date and weight and repetition results, in a form of a list of a dictionaries to make it possible for website's Jinja code to interpret it to give the user correct information.
 ##### forgot
 This function enables a feature to access the account when the user forgets his password. It's based on a old school security question and answer method. Here answer basically works as a secondary password letting the user log in without the password he might've forgotten. The function itself first makes a get request for the username and then renders page template with a question assigned to this username. If the form is submitted it compares username and answer provided to those in the database and if they match it logs user in and redirects him to the page where he can create a new password in place of a forgotten one. If the given answer doesn't match the one in the database it flashes the user with a error message. 
-#### Pages specification
+#### Pages and features
 ##### Homepage
 Homepage allows you to choose from three buttons in the navigation bar. On 'Home' site there is quick introduction to the application and links allowing user to log in or register. 'Log in' is a simple form for logging the user in and 'Register' is a bit more compound form, which demands more information for registration purposes. Apart from the regular username, password and password confirmation fields the user needs to provide a 'Security question' and 'Answer' to it for the case in which he forgets his password and needs to reset it to get access to his account. 
 ##### User's main page

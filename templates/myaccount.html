@@ -12,10 +12,14 @@
 
 
 <div class="container-fluid mx-auto">
-    <form action="/newq" method="get">
-        <button class="btn btn-secondary mt-3 w-auto" type="submit">Change security question</button>
-    </form>
-    <form action="/newpass" method="get">
+    <button class="btn btn-secondary w-auto" type="button" data-bs-toggle="collapse" data-bs-target="#question" aria-expanded="false" aria-controls="question">Show security question</button>
+    <div class="collapse" id="question">
+        <ul class="list-group mt-3">
+            <li class="list-group-item">Your security question is: {{ question }}</li>
+        </ul>
+    </div>
+    
+    <form action="/password" method="post">
         <button class="btn btn-secondary mt-3 w-auto" type="submit">Change password</button>
     </form>
 </div>
